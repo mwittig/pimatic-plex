@@ -78,11 +78,18 @@ module.exports = (env) ->
       @id = config.id
 
       @_plexClient = new PlexAPI(config.server)
+      @_plexControl = new PlexControl(config.server, config.player);
+      
 
       setInterval( ( => @_getStatus() ), @config.interval)
 
       super()
-      
+
+    play:() -> @_plexControl.playback.play().then((state) => @_getStatus())
+    pause:() -> @_plexControl.playback.pause().then((state) => @_getStatus())
+    stop:() -> @_plexControl.playback.stop().then((state)  => @_getStatus())
+    next:() -> @_plexControl.playback.bigStepForward().then(()  => @_getStatus())
+    previous:() -> @_plexControl.playback.bigStepBack().then(()  => @_getStatus())
     getState: -> Promise.resolve(@_state)
     getCurrentTitle: -> Promise.resolve(@_currentTitle)
     getCurrentType: -> Promise.resolve(@_currentType)
@@ -103,9 +110,9 @@ module.exports = (env) ->
         for item in result._children
           
           for entry in item._children
-            if entry._elementType is 'Player' and entry.machineIdentifier isnt @config.player
+            if entry._elementType is 'Player' and entry.machineIdentifier isnt @config.player and entry.title isnt @config.player
               env.logger.debug("Found unknown %s with id %s and name %s.", entry.product, entry.machineIdentifier, entry.title)
-            if entry._elementType is 'Player' and entry.machineIdentifier is @config.player
+            if entry._elementType is 'Player' and (entry.machineIdentifier is @config.player or entry.title is @config.player)
               console.log(entry.machineIdentifier)
               if entry.state is 'playing'
                   @_state = 'play'
