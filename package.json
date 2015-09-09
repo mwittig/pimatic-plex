@@ -1,0 +1,29 @@
+{
+  "name": "pimatic-plex",
+  "version": "0.0.1",
+  "description": "Plex Plugin for the pimatic home automation framework",
+  "main": "plex",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tester22/pimatic-plex.git"
+  },
+  "peerDependencies": {
+    "pimatic": "0.8.*"
+  },
+ "files": [
+    "plex.coffee",
+    "README.md",
+    "plex-config-schema.coffee",
+    "device-config-schema.coffee"
+  ],
+  "configSchema": "plex-config-schema.coffee",
+  "dependencies": {
+	"plex-control": "2.0.1",
+    "plex-api": "3.1.1"
+  },
+  "keywords": [
+    "plex",
+    "pimatic"
+  ],
+  "homepage": "https://github.com/tester22/pimatic-plex"
+}
