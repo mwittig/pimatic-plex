@@ -12,6 +12,18 @@ module.exports ={
         description: "The port of plex server"
         type: "number",
         default: 32400
+      guid:
+        description: "The internal guid"
+        type: "string"
+        default: ""
+      username:
+        description: "The username for the plex server"
+        type: "string",
+        default: ""
+      password:
+        description: "The password for the plex server"
+        type: "string",
+        default: ""
       player:
         description: "The name of plex player"
         type: "string"

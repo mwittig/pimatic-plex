@@ -77,9 +77,16 @@ module.exports = (env) ->
       @name = config.name
       @id = config.id
 
-      @_plexClient = new PlexAPI(config.server)
-      @_plexControl = new PlexControl(config.server, config.player);
+      uuid = require('node-uuid')
       
+      @config.guid = uuid.v4() if not config.guid
+
+      PlexConnectionString = {hostname: config.server, port: config.port, product: 'Pimatic', identifier: config.guid}
+      PlexConnectionString['username'] = config.username if config.username
+      PlexConnectionString['password'] = config.password if config.password
+
+      @_plexClient = new PlexAPI(PlexConnectionString)
+      @_plexControl = new PlexControl(config.server, config.player);
 
       setInterval( ( => @_getStatus() ), @config.interval)
 
@@ -113,7 +120,7 @@ module.exports = (env) ->
             if entry._elementType is 'Player' and entry.machineIdentifier isnt @config.player and entry.title isnt @config.player
               env.logger.debug("Found unknown %s with id %s and name %s.", entry.product, entry.machineIdentifier, entry.title)
             if entry._elementType is 'Player' and (entry.machineIdentifier is @config.player or entry.title is @config.player)
-              console.log(entry.machineIdentifier)
+              #console.log(entry.machineIdentifier)
               if entry.state is 'playing'
                   @_state = 'play'
               if entry.state is 'paused'
@@ -131,17 +138,6 @@ module.exports = (env) ->
         @emit "currentShow", @_currentShow
         @emit "currentProduct", @_currentProduct
         @emit "currentClient", @_currentClient
-      )
-
-  class PlexPrevActionHandler extends env.actions.ActionHandler
-    constructor: (@device) -> #nop
-
-    executeAction: (simulate) =>
-      return (
-        if simulate
-          Promise.resolve __("would play previous track of %s", @device.name)
-        else
-          @device.previous().then( => __("play previous track of %s", @device.name) )
       )
 
 
