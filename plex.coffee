@@ -8,7 +8,8 @@ module.exports = (env) ->
 
   M = env.matcher
   _ = env.require('lodash')
-
+  
+  uuid = require('node-uuid')
   PlexAPI = require("plex-api")
 
   Promise.promisifyAll(PlexAPI.prototype);
@@ -75,8 +76,6 @@ module.exports = (env) ->
     constructor: (@config) ->
       @name = config.name
       @id = config.id
-
-      uuid = require('node-uuid')
       
       @config.guid = uuid.v4() if not config.guid
 
@@ -85,6 +84,9 @@ module.exports = (env) ->
       PlexConnectionString['password'] = config.password if config.password
 
       @_plexClient = new PlexAPI(PlexConnectionString)
+      
+      @_getConfig()
+      
 
       setInterval( ( => @_getStatus() ), @config.interval)
 
@@ -138,6 +140,13 @@ module.exports = (env) ->
         @emit "currentClient", @_currentClient
       )
 
+    _getConfig: () ->
+      @_plexClient.query("/clients").then( (result) =>
+        for item in result._children
+          if item.name is @config.player
+            env.logger.debug("Setting playerIp to %s since it is named %s.", item.address, entry.title)
+            @config.playerIp = item.address
+      )
 
   plexPlugin = new PlexPlugin
   return plexPlugin

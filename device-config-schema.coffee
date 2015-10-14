@@ -1,15 +1,15 @@
 module.exports ={
-  title: "pimatic-plex device config schemas"
+  title: "pimatic-Plex device config schemas"
   PlexPlayer: {
-    title: "plex config options"
+    title: "Plex config options"
     type: "object"
     extensions: ["xLink"]
     properties:
       server:
-        description: "The address of plex server"
+        description: "The address of Plex server"
         type: "string"
       port:
-        description: "The port of plex server"
+        description: "The port of Plex server"
         type: "number",
         default: 32400
       guid:
@@ -17,22 +17,22 @@ module.exports ={
         type: "string"
         default: ""
       username:
-        description: "The username for the plex server"
+        description: "The username for the Plex server"
         type: "string",
         default: ""
       password:
-        description: "The password for the plex server"
+        description: "The password for the Plex server"
         type: "string",
         default: ""
       player:
-        description: "The name of plex player"
+        description: "The name of Plex player"
         type: "string"
       playerIp:
-        description: "The name of plex player"
+        description: "The ip of Plex player"
         type: "string"
         default: ""
       interval:
-        interval: "Interval in ms so read the plex state"
+        interval: "Interval in ms so read the Plex state"
         type: "integer"
         default: 5000
   }
