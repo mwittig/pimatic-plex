@@ -27,6 +27,10 @@ module.exports ={
       player:
         description: "The name of plex player"
         type: "string"
+      playerIp:
+        description: "The name of plex player"
+        type: "string"
+        default: ""
       interval:
         interval: "Interval in ms so read the plex state"
         type: "integer"

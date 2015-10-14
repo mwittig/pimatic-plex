@@ -9,7 +9,6 @@ module.exports = (env) ->
   M = env.matcher
   _ = env.require('lodash')
 
-  PlexControl = require("plex-control").PlexControl
   PlexAPI = require("plex-api")
 
   Promise.promisifyAll(PlexAPI.prototype);
@@ -86,17 +85,16 @@ module.exports = (env) ->
       PlexConnectionString['password'] = config.password if config.password
 
       @_plexClient = new PlexAPI(PlexConnectionString)
-      @_plexControl = new PlexControl(config.server, config.player);
 
       setInterval( ( => @_getStatus() ), @config.interval)
 
       super()
 
-    play:() -> @_plexControl.playback.play().then((state) => @_getStatus())
-    pause:() -> @_plexControl.playback.pause().then((state) => @_getStatus())
-    stop:() -> @_plexControl.playback.stop().then((state)  => @_getStatus())
-    next:() -> @_plexControl.playback.bigStepForward().then(()  => @_getStatus())
-    previous:() -> @_plexControl.playback.bigStepBack().then(()  => @_getStatus())
+    play:() -> @_plexClient.query("/system/players/" + @config.playerIp + "/playback/play").then((state) => @_getStatus())
+    pause:() -> @_plexClient.query("/system/players/" + @config.playerIp + "/playback/pause").then((state) => @_getStatus())
+    stop:() -> @_plexClient.query("/system/players/" + @config.playerIp + "/playback/stop").then((state)  => @_getStatus())
+    next:() -> @_plexClient.query("/system/players/" + @config.playerIp + "/playback/stepForward").then(()  => @_getStatus())
+    previous:() -> @_plexClient.query("/system/players/" + @config.playerIp + "/playback/stepBack").then(()  => @_getStatus())
     getState: -> Promise.resolve(@_state)
     getCurrentTitle: -> Promise.resolve(@_currentTitle)
     getCurrentType: -> Promise.resolve(@_currentType)
