@@ -17,6 +17,7 @@ pimatic plugin for controlling the [Plex players](http://www.plex.tv/).
   "server": "192.168.1.102",
   "port": 1400,
   "player": "abc123",
+  "playerIp": "192.168.1.103",
   "intervall": 60000,
   "username": "abc123" # Optional
   "password": "abc123" # Optional
