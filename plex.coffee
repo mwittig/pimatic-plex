@@ -152,7 +152,7 @@ module.exports = (env) ->
           @emit "currentType", @_currentType
           @_currentProgress = 0
           @emit "currentProgress", @_currentProgress
-          @_currentShow = item.grandparentTitle
+          @_currentShow = ""
           @emit "currentShow", @_currentShow
       )
 
