@@ -28,13 +28,13 @@ module.exports = (env) ->
 
   class PlexPlayer extends env.devices.AVPlayer
 
-    _state: null
-    _currentTitle: null
-    _currentType: null
-    _currentProgress: null
-    _currentShow: null
-    _currentProduct: null
-    _currentClient: null
+    _state: "stopped"
+    _currentTitle: ""
+    _currentType: ""
+    _currentProgress: 0
+    _currentShow: ""
+    _currentProduct: ""
+    _currentClient: ""
 
     actions:
       play:
@@ -63,6 +63,7 @@ module.exports = (env) ->
       currentProgress:
         description: "the current progress of title"
         type: "number"
+        unit: '%'
       currentShow:
         description: "the current playing show"
         type: "string"
@@ -107,37 +108,52 @@ module.exports = (env) ->
 
     _getStatus: () ->
       @_plexClient.query("/status/sessions").then( (result) =>
-        @_state = "stopped"
-        @_currentTitle = ""
-        @_currentType = ""
-        @_currentProgress = 0
-        @_currentShow = ""
-        @_currentProduct = ""
-        @_currentClient = ""
+        plexClientFound = false
         for item in result._children
-          
           for entry in item._children
             if entry._elementType is 'Player' and entry.machineIdentifier isnt @config.player and entry.title isnt @config.player
               env.logger.debug("Found unknown %s with id %s and name %s.", entry.product, entry.machineIdentifier, entry.title)
             if entry._elementType is 'Player' and (entry.machineIdentifier is @config.player or entry.title is @config.player)
-              #console.log(entry.machineIdentifier)
-              if entry.state is 'playing'
-                  @_state = 'play'
-              if entry.state is 'paused'
-                  @_state = 'pause'
-              @_currentProduct = entry.product
-              @_currentClient = entry.title
-              @_currentTitle = item.title
-              @_currentType = item.type
-              @_currentProgress = Math.floor((item.viewOffset / item.duration) * 100)
-              @_currentShow = item.grandparentTitle
-        @emit "state", @_state
-        @emit "currentTitle", @_currentTitle
-        @emit "currentType", @_currentType
-        @emit "currentProgress", @_currentProgress
-        @emit "currentShow", @_currentShow
-        @emit "currentProduct", @_currentProduct
-        @emit "currentClient", @_currentClient
+              plexClientFound = true
+              if entry.state is 'playing' and @_state != 'playing'
+                @_state = 'playing'
+                @emit "state", @_state
+              else if entry.state is 'paused' and @_state != 'paused'
+                @_state = 'paused'
+                @emit "state", @_state
+              if @_currentProduct != entry.product
+                @_currentProduct = entry.product
+                @emit "currentProduct", @_currentProduct
+              if @_currentClient != entry.title
+                @_currentClient = entry.title
+                @emit "currentClient", @_currentClient
+              if @_currentTitle != item.title
+                @_currentTitle = item.title
+                @emit "currentTitle", @_currentTitle
+              if @_currentType != item.type
+                @_currentType = item.type
+                @emit "currentType", @_currentType
+              if @_currentProgress != Math.round((item.viewOffset / item.duration) * 100)
+                @_currentProgress = Math.round((item.viewOffset / item.duration) * 100)
+                @emit "currentProgress", @_currentProgress
+              if @_currentShow != item.grandparentTitle
+                @_currentShow = item.grandparentTitle
+                @emit "currentShow", @_currentShow
+        if plexClientFound == false and @_state != 'stopped'
+          @_state = 'stopped'
+          @emit "state", @_state
+          @_currentProduct = ""
+          @emit "currentProduct", @_currentProduct
+          @_currentClient = ""
+          @emit "currentClient", @_currentClient
+          @_currentTitle = ""
+          @emit "currentTitle", @_currentTitle
+          @_currentType = ""
+          @emit "currentType", @_currentType
+          @_currentProgress = 0
+          @emit "currentProgress", @_currentProgress
+          @_currentShow = item.grandparentTitle
+          @emit "currentShow", @_currentShow
       )
 
     _getConfig: () ->
