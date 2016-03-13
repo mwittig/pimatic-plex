@@ -107,13 +107,13 @@ module.exports = (env) ->
 
     _getStatus: () ->
       @_plexClient.query("/status/sessions").then( (result) =>
-        @_state = null
-        @_currentTitle = null
-        @_currentType = null
-        @_currentProgress = null
-        @_currentShow = null
-        @_currentProduct = null
-        @_currentClient = null
+        @_state = "stopped"
+        @_currentTitle = ""
+        @_currentType = ""
+        @_currentProgress = 0
+        @_currentShow = ""
+        @_currentProduct = ""
+        @_currentClient = ""
         for item in result._children
           
           for entry in item._children
