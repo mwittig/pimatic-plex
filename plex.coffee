@@ -12,7 +12,7 @@ module.exports = (env) ->
   uuid = require('node-uuid')
   PlexAPI = require("plex-api")
 
-  Promise.promisifyAll(PlexAPI.prototype);
+  Promise.promisifyAll(PlexAPI.prototype)
 
   class PlexPlugin extends env.plugins.Plugin
 
@@ -22,19 +22,19 @@ module.exports = (env) ->
 
       @framework.deviceManager.registerDeviceClass("PlexPlayer", {
         configDef: deviceConfigDef.PlexPlayer,
-        createCallback: (config) -> new PlexPlayer(config)
+        createCallback: (config, lastState) -> new PlexPlayer(config, lastState)
       })
 
 
   class PlexPlayer extends env.devices.AVPlayer
 
-    _state: "stopped"
-    _currentTitle: ""
-    _currentType: ""
-    _currentProgress: 0
-    _currentShow: ""
-    _currentProduct: ""
-    _currentClient: ""
+    _state: null
+    _currentTitle: null
+    _currentType: null
+    _currentProgress: null
+    _currentShow: null
+    _currentProduct: null
+    _currentClient: null
 
     actions:
       play:
@@ -74,15 +74,23 @@ module.exports = (env) ->
         description: "the current client"
         type: "string"
 
-    constructor: (@config) ->
+    constructor: (@config, lastState) ->
       @name = config.name
       @id = config.id
-      
+
+      @_state: lastState?.state?.value
+      @_currentTitle:  lastState?.currentTitle?.value
+      @_currentType:  lastState?.currentType?.value
+      @_currentProgress:  lastState?.currentProgress?.value or 0
+      @_currentShow:  lastState?.currentShow?.value
+      @_currentProduct:  lastState?.currentProduct?.value
+      @_currentClient:  lastState?.currentClient?.value
+
       @config.guid = uuid.v4() if not config.guid
 
-      PlexConnectionString = {hostname: config.server, port: config.port, product: 'Pimatic', identifier: config.guid}
-      PlexConnectionString['username'] = config.username if config.username
-      PlexConnectionString['password'] = config.password if config.password
+      PlexConnectionString = {hostname: config.server, port: config.port, product: 'pimatic', identifier: config.guid}
+      PlexConnectionString['username'] = config.username if config.username?
+      PlexConnectionString['password'] = config.password if config.password?
 
       @_plexClient = new PlexAPI(PlexConnectionString)
       
@@ -115,45 +123,45 @@ module.exports = (env) ->
               env.logger.debug("Found unknown %s with id %s and name %s.", entry.product, entry.machineIdentifier, entry.title)
             if entry._elementType is 'Player' and (entry.machineIdentifier is @config.player or entry.title is @config.player)
               plexClientFound = true
-              if entry.state is 'playing' and @_state != 'playing'
+              if entry.state is 'playing' and @_state isnt 'playing'
                 @_state = 'playing'
                 @emit "state", @_state
-              else if entry.state is 'paused' and @_state != 'paused'
+              else if entry.state is 'paused' and @_state isnt 'paused'
                 @_state = 'paused'
                 @emit "state", @_state
-              if @_currentProduct != entry.product
+              if @_currentProduct isnt entry.product
                 @_currentProduct = entry.product
                 @emit "currentProduct", @_currentProduct
-              if @_currentClient != entry.title
+              if @_currentClient isnt entry.title
                 @_currentClient = entry.title
                 @emit "currentClient", @_currentClient
-              if @_currentTitle != item.title
+              if @_currentTitle isnt item.title
                 @_currentTitle = item.title
                 @emit "currentTitle", @_currentTitle
-              if @_currentType != item.type
+              if @_currentType isnt item.type
                 @_currentType = item.type
                 @emit "currentType", @_currentType
-              if @_currentProgress != Math.round((item.viewOffset / item.duration) * 100)
+              if @_currentProgress isnt Math.round((item.viewOffset / item.duration) * 100)
                 @_currentProgress = Math.round((item.viewOffset / item.duration) * 100)
                 @emit "currentProgress", @_currentProgress
-              if @_currentShow != item.grandparentTitle
+              if @_currentShow isnt item.grandparentTitle
                 @_currentShow = item.grandparentTitle
                 @emit "currentShow", @_currentShow
-        if plexClientFound == false and @_state != 'stopped'
-          @_state = 'stopped'
-          @emit "state", @_state
-          @_currentProduct = ""
-          @emit "currentProduct", @_currentProduct
-          @_currentClient = ""
-          @emit "currentClient", @_currentClient
-          @_currentTitle = ""
-          @emit "currentTitle", @_currentTitle
-          @_currentType = ""
-          @emit "currentType", @_currentType
+        if not plexClientFound and @_state?
+          @_state = null
+          @emit "state", null
+          @_currentProduct = null
+          @emit "currentProduct", null
+          @_currentClient = null
+          @emit "currentClient", null
+          @_currentTitle = null
+          @emit "currentTitle", null
+          @_currentType = null
+          @emit "currentType", 0
           @_currentProgress = 0
-          @emit "currentProgress", @_currentProgress
-          @_currentShow = ""
-          @emit "currentShow", @_currentShow
+          @emit "currentProgress", null
+          @_currentShow = null
+          @emit "currentShow",  null
       )
 
     _getConfig: () ->
