@@ -157,9 +157,9 @@ module.exports = (env) ->
           @_currentTitle = ""
           @emit "currentTitle", ""
           @_currentType = ""
-          @emit "currentType", 0
+          @emit "currentType", ""
           @_currentProgress = 0
-          @emit "currentProgress", ""
+          @emit "currentProgress", 0
           @_currentShow = ""
           @emit "currentShow",  ""
       )
