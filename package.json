@@ -8,7 +8,7 @@
     "url": "https://github.com/tester22/pimatic-plex.git"
   },
   "peerDependencies": {
-    "pimatic": "0.8.*"
+    "pimatic": ">=0.8.0 <1.0.0"
   },
   "files": [
     "plex.coffee",
