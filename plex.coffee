@@ -75,6 +75,7 @@ module.exports = (env) ->
         type: "string"
 
     constructor: (@config, lastState) ->
+      config = @config
       @name = config.name
       @id = config.id
 
