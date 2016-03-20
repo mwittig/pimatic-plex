@@ -78,13 +78,13 @@ module.exports = (env) ->
       @name = config.name
       @id = config.id
 
-      @_state: lastState?.state?.value
-      @_currentTitle:  lastState?.currentTitle?.value
-      @_currentType:  lastState?.currentType?.value
-      @_currentProgress:  lastState?.currentProgress?.value or 0
-      @_currentShow:  lastState?.currentShow?.value
-      @_currentProduct:  lastState?.currentProduct?.value
-      @_currentClient:  lastState?.currentClient?.value
+      @_state = lastState?.state?.value
+      @_currentTitle = lastState?.currentTitle?.value
+      @_currentType = lastState?.currentType?.value
+      @_currentProgress = lastState?.currentProgress?.value or 0
+      @_currentShow = lastState?.currentShow?.value
+      @_currentProduct = lastState?.currentProduct?.value
+      @_currentClient = lastState?.currentClient?.value
 
       @config.guid = uuid.v4() if not config.guid
 
@@ -147,21 +147,21 @@ module.exports = (env) ->
               if @_currentShow isnt item.grandparentTitle
                 @_currentShow = item.grandparentTitle
                 @emit "currentShow", @_currentShow
-        if not plexClientFound and @_state?
-          @_state = null
-          @emit "state", null
-          @_currentProduct = null
-          @emit "currentProduct", null
-          @_currentClient = null
-          @emit "currentClient", null
-          @_currentTitle = null
-          @emit "currentTitle", null
-          @_currentType = null
+        if not plexClientFound and @_state isnt 'stopped'
+          @_state = 'stopped'
+          @emit "state", 'stopped'
+          @_currentProduct = ""
+          @emit "currentProduct", ""
+          @_currentClient = ""
+          @emit "currentClient", ""
+          @_currentTitle = ""
+          @emit "currentTitle", ""
+          @_currentType = ""
           @emit "currentType", 0
           @_currentProgress = 0
-          @emit "currentProgress", null
-          @_currentShow = null
-          @emit "currentShow",  null
+          @emit "currentProgress", ""
+          @_currentShow = ""
+          @emit "currentShow",  ""
       )
 
     _getConfig: () ->
