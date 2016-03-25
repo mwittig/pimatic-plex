@@ -1,6 +1,6 @@
 {
   "name": "pimatic-plex",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Plex Plugin for the pimatic home automation framework",
   "main": "plex",
   "repository": {
