@@ -75,8 +75,9 @@ module.exports = (env) ->
         type: "string"
 
     constructor: (@config, lastState) ->
-      @name = config.name
-      @id = config.id
+
+      @name = @config.name
+      @id = @config.id
 
       @_state = lastState?.state?.value
       @_currentTitle = lastState?.currentTitle?.value
@@ -86,11 +87,11 @@ module.exports = (env) ->
       @_currentProduct = lastState?.currentProduct?.value
       @_currentClient = lastState?.currentClient?.value
 
-      @config.guid = uuid.v4() if not config.guid
+      @config.guid = uuid.v4() if not @config.guid
 
-      PlexConnectionString = {hostname: config.server, port: config.port, product: 'pimatic', identifier: config.guid}
-      PlexConnectionString['username'] = config.username if config.username?
-      PlexConnectionString['password'] = config.password if config.password?
+      PlexConnectionString = {hostname: @config.server, port: @config.port, product: 'pimatic', identifier: @config.guid}
+      PlexConnectionString['username'] = @config.username if @config.username?
+      PlexConnectionString['password'] = @config.password if @config.password?
 
       @_plexClient = new PlexAPI(PlexConnectionString)
       
