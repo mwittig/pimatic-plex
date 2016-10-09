@@ -22,7 +22,7 @@ The first time the plugin is loaded it will generate an guid and load the ip of 
   "port": 32400,
   "player": "abc123",
   "playerIp": "192.168.1.103",
-  "intervall": 60000,
+  "interval": 60000,
   "guid": "xxxx-xxxx-xxxx-xxxx",
   "username": "abc123" # Optional
   "password": "abc123" # Optional
