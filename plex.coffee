@@ -98,8 +98,12 @@ module.exports = (env) ->
       @_getConfig()
       
 
-      setInterval( ( => @_getStatus() ), @config.interval)
+      @intervalTimerId = setInterval( ( => @_getStatus() ), @config.interval)
 
+      super()
+
+    destroy: () ->
+      clearInterval @intervalTimerId if @intervalTimerId?
       super()
 
     play:() -> @_plexClient.query("/system/players/" + @config.playerIp + "/playback/play").then((state) => @_getStatus())
